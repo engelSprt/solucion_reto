@@ -1,0 +1,57 @@
+
+		  NAMEREG  s5, DatoSerial
+		  NAMEREG  s6, EstadoTX
+		  NAMEREG  s7, EstadoRX
+		  NAMEREG	 s8, LeidoRX
+
+      NAMEREG  s0, RegistroEntradaXLSB
+      NAMEREG  s1, RegistroEntradaXMSB
+      NAMEREG  s2, RegistroEntradaYLSB
+      NAMEREG  s3, RegistroEntradaYMSB
+      NAMEREG  s4, RegistroEntradaZLSB
+      NAMEREG  s9, RegistroEntradaZMSB
+
+      CONSTANT PuertoEntradaXLSB, 41
+      CONSTANT PuertoEntradaXMSB, 42
+      CONSTANT PuertoEntradaYLSB, 43
+      CONSTANT PuertoEntradaYMSB, 44
+      CONSTANT PuertoEntradaZLSB, 45
+      CONSTANT PuertoEntradaZMSB, 46
+      CONSTANT PuertoSalidaLEDS,  02
+
+      CONSTANT PuertoLeeListoTX,    11
+      CONSTANT PuertoEscribeDatoTX, 12
+      CONSTANT PuertoLeeDatoRX,     13
+      CONSTANT PuertoDatoListoRX,   14
+      CONSTANT PuertoDatoRXLeido,   15
+      CONSTANT PuertoSalida,        80
+
+lecturadatos:
+
+      INPUT  RegistroEntradaXMSB, PuertoEntradaXMSB
+      LOAD   DatoSerial, RegistroEntradaXMSB
+      CALL   tx_uart
+      INPUT  RegistroEntradaXLSB, PuertoEntradaXLSB
+      LOAD   DatoSerial, RegistroEntradaXLSB
+      CALL   tx_uart
+
+      CAll   delay_1s
+      JUMP lecturadatos
+
+tx_uart:
+    INPUT		  EstadoTX, PuertoLeeListoTX
+    COMPARE		EstadoTX, 02
+    JUMP		  Z, tx_uart
+    OUTPUT		DatoSerial, PuertoEscribeDatoTX
+    RETURN
+	
+delay_1s:
+    LOAD      sa, 5f
+    LOAD      sb, 5e
+    LOAD      sc, 10
+delay_loop:
+    SUB 		  sc, 1'd
+    SUBCY 		sb, 0'd
+    SUBCY 		sa, 0'd
+    JUMP 		  NZ, delay_loop
+    RETURN
